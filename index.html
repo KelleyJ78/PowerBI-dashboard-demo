@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PE Buyer Database Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .dashboard-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .filters-section {
+            background: #f8f9fa;
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .filters-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        
+        .search-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 15px;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .clear-button {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+            padding: 13px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .clear-button:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .results-section {
+            padding: 30px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .results-count {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .export-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .export-button:hover {
+            background: #218838;
+        }
+        
+        .results-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .pe-firm-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .pe-firm-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .firm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .firm-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .match-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .firm-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            margin-right: 8px;
+            min-width: 80px;
+        }
+        
+        .detail-value {
+            color: #2c3e50;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .badge-platform {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .badge-addon {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .badge-hvac {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-roofing {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+        
+        .badge-landscaping {
+            background: #f1f8e9;
+            color: #689f38;
+        }
+        
+        .badge-windows {
+            background: #e1f5fe;
+            color: #0277bd;
+        }
+        
+        .contact-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .contact-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .selected-filters {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .filter-tag {
+            background: #1976d2;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-tag .remove {
+            margin-left: 5px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .interactive-hint {
+            position: absolute;
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .pe-firm-card:hover .interactive-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>PE Buyer Database</h1>
+                <div class="header-info">Last Updated: August 13, 2025 | 250+ PE Firms | Roofing • Landscaping • Windows</div>
+            </div>
+            <div class="header-info">
+                Iconic Founders
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-title">🎯 Find Your Perfect PE Buyers</div>
+            
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <div class="filter-label">Industry Search (NAICS, SIC, or Name)</div>
+                    <select class="filter-select" onchange="updateSelectedIndustry(this)" id="unifiedIndustrySearch">
+                        <option value="">Search by Code or Industry Name</option>
+                        <optgroup label="Roofing">
+                            <option value="naics_238160">238160 - Roofing Contractors (NAICS)</option>
+                            <option value="sic_1761">1761 - Roofing, Siding, Sheet Metal (SIC)</option>
+                            <option value="name_roofing">Residential Roofing (General)</option>
+                        </optgroup>
+                        <optgroup label="Landscaping">
+                            <option value="naics_561730">561730 - Landscaping Services (NAICS)</option>
+                            <option value="sic_0782">0782 - Lawn and Garden Services (SIC)</option>
+                            <option value="name_landscaping">Commercial Landscaping (General)</option>
+                        </optgroup>
+                        <optgroup label="Windows/Glass">
+                            <option value="naics_238150">238150 - Glass and Glazing Contractors (NAICS)</option>
+                            <option value="sic_1793">1793 - Glass and Glazing Work (SIC)</option>
+                            <option value="name_windows">Window Replacement (General)</option>
+                        </optgroup>
+                    </select>
+                    <div class="selected-industry-info" id="selectedIndustryInfo" style="font-size: 11px; color: #6c757d; margin-top: 5px; display: none;">
+                        <span id="industryTypeDisplay"></span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Geographic Region</div>
+                    <select class="filter-select">
+                        <option value="">All Regions</option>
+                        <option value="northeast">Northeast (NY, NJ, PA, CT, MA, RI, VT, NH, ME)</option>
+                        <option value="southeast">Southeast (FL, GA, SC, NC, VA, WV, KY, TN, AL, MS, AR, LA)</option>
+                        <option value="midwest">Midwest (OH, IN, IL, MI, WI, MN, IA, MO, ND, SD, NE, KS)</option>
+                        <option value="southwest">Southwest (TX, OK, NM, AZ)</option>
+                        <option value="west_coast">West Coast (CA, OR, WA, NV, ID, UT, CO, WY, MT, AK, HI)</option>
+                        <option value="national">National (All Regions)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Revenue Range</div>
+                    <select class="filter-select">
+                        <option value="">Any Revenue</option>
+                        <option value="under15m">&lt;$15M</option>
+                        <option value="15m-30m">$15M-&lt;$30M</option>
+                        <option value="30m-60m">$30M-&lt;$60M</option>
+                        <option value="60m-150m">$60M-&lt;$150M</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">EBITDA Range</div>
+                    <select class="filter-select">
+                        <option value="">Any EBITDA</option>
+                        <option value="under3m">&lt;$3M</option>
+                        <option value="3m-5m">$3M-&lt;$5M</option>
+                        <option value="5m-10m">$5M-&lt;$10M</option>
+                        <option value="10m-25m">$10M-&lt;$25M</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Buyer Type</div>
+                    <select class="filter-select">
+                        <option value="">Both Platform & Add-on</option>
+                        <option value="platform_only">Platform Buyers Only</option>
+                        <option value="addon_only">Add-on Buyers Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="search-button" onclick="searchPEFirms()">🔍 Search PE Buyers</button>
+                <button class="clear-button" onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section">
+            <!-- Current Filters Display -->
+            <div class="selected-filters">
+                <span style="font-weight: 600; color: #1976d2;">Active Filters:</span>
+                <div class="filter-tag">NAICS 238160 - Roofing <span class="remove">×</span></div>
+                <div class="filter-tag">Southeast <span class="remove">×</span></div>
+                <div class="filter-tag">$5M-$10M EBITDA <span class="remove">×</span></div>
+                <div class="filter-tag">Platform Buyers Only <span class="remove">×</span></div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Matching PE Firms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Platform Buyers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Add-on Buyers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Contact Coverage</div>
+                </div>
+            </div>
+
+            <!-- Results Header -->
+            <div class="results-header">
+                <div class="results-count">12 PE Firms Found (Showing Top Matches)</div>
+                <div>
+                    <select style="margin-right: 15px; padding: 8px; border: 1px solid #e9ecef; border-radius: 4px;">
+                        <option>Sort by Match Score</option>
+                        <option>Sort by Deal Size</option>
+                        <option>Sort by Geographic Proximity</option>
+                        <option>Sort by Recent Activity</option>
+                    </select>
+                    <button class="export-button" onclick="exportResults()">📊 Export to Excel</button>
+                </div>
+            </div>
+
+            <!-- PE Firms Results -->
+            <div class="results-grid">
+                <!-- PE Firm Card 1 -->
+                <div class="pe-firm-card" onclick="showFirmDetails('southfield')">
+                    <div class="interactive-hint">Click for detailed portfolio and deal history</div>
+                    <div class="firm-header">
+                        <h3 class="firm-name">Southfield Capital</h3>
+                        <div class="match-score">96% Match</div>
+                    </div>
+                    
+                    <div class="firm-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Type:</span>
+                            <span class="badge badge-platform">Platform</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Focus:</span>
+                            <span class="badge badge-roofing">Residential Roofing</span>
+                            <span class="badge badge-landscaping">Commercial Landscaping</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Location:</span>
+                            <span class="detail-value">Greenwich, CT</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Deal Size:</span>
+                            <span class="detail-value">$5M - $25M EBITDA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Geographic:</span>
+                            <span class="detail-value">Southeast Focus</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Recent:</span>
+                            <span class="detail-value">2 Roofing deals in 2024</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-section">
+                        <div class="contact-title">Key Contacts</div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Managing Partner:</strong> <a href="#" class="contact-link">John Smith</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:jsmith@southfieldcapital.com" class="contact-link">jsmith@southfieldcapital.com</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Phone:</strong> <span class="detail-value">(203) 555-0123</span>
+                            </div>
+                            <div class="contact-item">
+                                <strong>LinkedIn:</strong> <a href="#" class="contact-link">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PE Firm Card 2 -->
+                <div class="pe-firm-card" onclick="showFirmDetails('meridian')">
+                    <div class="interactive-hint">Click for detailed portfolio and deal history</div>
+                    <div class="firm-header">
+                        <h3 class="firm-name">Meridian Capital Partners</h3>
+                        <div class="match-score">92% Match</div>
+                    </div>
+                    
+                    <div class="firm-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Type:</span>
+                            <span class="badge badge-addon">Add-on</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Focus:</span>
+                            <span class="badge badge-roofing">Residential Roofing</span>
+                            <span class="badge badge-landscaping">Window Replacement</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Location:</span>
+                            <span class="detail-value">Atlanta, GA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Deal Size:</span>
+                            <span class="detail-value">$3M - $15M EBITDA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Geographic:</span>
+                            <span class="detail-value">Southeast Regional</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Portfolio:</span>
+                            <span class="detail-value">5 HVAC companies owned</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-section">
+                        <div class="contact-title">Key Contacts</div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Principal:</strong> <a href="#" class="contact-link">Sarah Johnson</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:sjohnson@meridiancp.com" class="contact-link">sjohnson@meridiancp.com</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Phone:</strong> <span class="detail-value">(404) 555-0189</span>
+                            </div>
+                            <div class="contact-item">
+                                <strong>LinkedIn:</strong> <a href="#" class="contact-link">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PE Firm Card 3 -->
+                <div class="pe-firm-card" onclick="showFirmDetails('summit')">
+                    <div class="interactive-hint">Click for detailed portfolio and deal history</div>
+                    <div class="firm-header">
+                        <h3 class="firm-name">Summit Growth Partners</h3>
+                        <div class="match-score">89% Match</div>
+                    </div>
+                    
+                    <div class="firm-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Type:</span>
+                            <span class="badge badge-platform">Platform</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Focus:</span>
+                            <span class="badge badge-roofing">Window Replacement</span>
+                            <span class="badge badge-landscaping">Commercial Landscaping</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Location:</span>
+                            <span class="detail-value">Charlotte, NC</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Deal Size:</span>
+                            <span class="detail-value">$8M - $30M EBITDA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Geographic:</span>
+                            <span class="detail-value">Southeast + Texas</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Recent:</span>
+                            <span class="detail-value">Seeking first Window platform</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-section">
+                        <div class="contact-title">Key Contacts</div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <strong>Managing Director:</strong> <a href="#" class="contact-link">Michael Chen</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Email:</strong> <a href="mailto:mchen@summitgp.com" class="contact-link">mchen@summitgp.com</a>
+                            </div>
+                            <div class="contact-item">
+                                <strong>Phone:</strong> <span class="detail-value">(704) 555-0156</span>
+                            </div>
+                            <div class="contact-item">
+                                <strong>LinkedIn:</strong> <a href="#" class="contact-link">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="search-button" onclick="loadMore()">Load More Results (9 remaining)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateSelectedIndustry(select) {
+            const infoDisplay = document.getElementById('selectedIndustryInfo');
+            const typeDisplay = document.getElementById('industryTypeDisplay');
+            
+            if (select.value) {
+                const selectedText = select.options[select.selectedIndex].text;
+                const [type, code] = select.value.split('_');
+                
+                let searchType = '';
+                let searchQuery = '';
+                
+                if (type === 'naics') {
+                    searchType = 'NAICS Code';
+                    searchQuery = `naics_code = '${code}'`;
+                } else if (type === 'sic') {
+                    searchType = 'SIC Code';
+                    searchQuery = `sic_code = '${code}'`;
+                } else if (type === 'name') {
+                    searchType = 'Industry Name';
+                    searchQuery = `industry_name ILIKE '%${code}%'`;
+                }
+                
+                typeDisplay.innerHTML = `<strong>Search Type:</strong> ${searchType} | <strong>Query:</strong> ${selectedText}`;
+                infoDisplay.style.display = 'block';
+                
+                console.log(`Backend Query: WHERE ${searchQuery}`);
+            } else {
+                infoDisplay.style.display = 'none';
+            }
+        }
+
+        function searchPEFirms() {
+            const industrySearch = document.getElementById('unifiedIndustrySearch');
+            
+            let searchMessage = '🔍 Searching PE firms...\n\n';
+            
+            if (industrySearch.value) {
+                const selectedText = industrySearch.options[industrySearch.selectedIndex].text;
+                const [type, code] = industrySearch.value.split('_');
+                
+                if (type === 'naics') {
+                    searchMessage += `✅ Searching by NAICS Code: ${code}\n`;
+                    searchMessage += `📊 Found firms classified under NAICS ${code}\n`;
+                } else if (type === 'sic') {
+                    searchMessage += `✅ Searching by SIC Code: ${code}\n`;
+                    searchMessage += `📊 Found firms classified under SIC ${code}\n`;
+                } else if (type === 'name') {
+                    searchMessage += `✅ Searching by Industry Name: ${code}\n`;
+                    searchMessage += `📊 Found firms in ${code} industry\n`;
+                }
+                
+                searchMessage += `💼 ${selectedText}\n`;
+                searchMessage += `🎯 Results ranked by relevance`;
+            } else {
+                searchMessage += `✅ Showing all PE firms\n📊 No industry filter applied`;
+            }
+            
+            alert(searchMessage);
+        }
+
+        function clearFilters() {
+            // Reset unified search dropdown
+            document.getElementById('unifiedIndustrySearch').value = '';
+            document.getElementById('selectedIndustryInfo').style.display = 'none';
+            
+            alert('🧹 All filters cleared\n📊 Showing all 250+ PE firms\n🔄 Results refreshed');
+        }
+
+        function exportResults() {
+            // Simulate export functionality
+            alert('📊 Exporting to Excel...\n\n✅ File generated: PE_Buyers_HVAC_Southeast.xlsx\n📋 Includes: Company names, contacts, deal preferences\n📧 Ready for your business development team');
+        }
+
+        function showFirmDetails(firmId) {
+            // Simulate showing detailed firm information
+            const firmDetails = {
+                'southfield': 'Southfield Capital\n\n📈 Portfolio: 12 companies\n🎯 Investment Thesis: Buy-and-build in residential roofing and commercial landscaping\n💰 Fund Size: $500M\n📅 Recent Deal: Advanced Roofing Co (Feb 2024)\n🏆 Platform Strategy: Seeking regional roofing leaders',
+                'meridian': 'Meridian Capital Partners\n\n📈 Portfolio: 8 roofing companies\n🎯 Investment Thesis: Add-on acquisitions for scale\n💰 Fund Size: $300M\n📅 Recent Deal: Atlanta Roofing Systems (Jan 2024)\n🏆 Add-on Strategy: Geographic expansion focus',
+                'summit': 'Summit Growth Partners\n\n📈 Portfolio: 15 home service companies\n🎯 Investment Thesis: Platform + add-on model\n💰 Fund Size: $750M\n📅 Recent Activity: Evaluating window replacement platforms\n🏆 New Platform: Actively seeking first window replacement investment'
+            };
+            
+            alert('🔍 Detailed Firm Analysis\n\n' + firmDetails[firmId]);
+        }
+
+        function loadMore() {
+            alert('📋 Loading additional results...\n\n✅ Showing 9 more PE firms\n🎯 Sorted by match score\n📊 All with verified contact information');
+        }
+
+        // Add some interactive behaviors
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate real-time filtering
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // Visual feedback for filter changes
+                    this.style.borderColor = '#667eea';
+                    setTimeout(() => {
+                        this.style.borderColor = '#e9ecef';
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
